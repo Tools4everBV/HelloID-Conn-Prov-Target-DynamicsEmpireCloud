@@ -149,7 +149,7 @@ try {
     # Get Users & Filter on correlation fields
     $Users = Invoke-RestMethod `
                 -Method Get `
-                -Uri $("$baseurl/api/microsoft/automation/v2.0/users?company=$($actionContext.Data.DefaultCompany)") `
+                -Uri $("$baseurl/api/microsoft/automation/v2.0/users?company=$($actionContext.Configuration.DefaultCompany)") `
                 -Headers $authHeaders
 
     $Result = $Users.value | Group-Object $correlationProperty -AsHashTable
@@ -225,4 +225,5 @@ catch {
             Message = $auditMessage
             IsError = $true
         })
+
 }
