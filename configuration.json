@@ -41,5 +41,15 @@
         "placeholder": "Production",
         "required": true
       }
+    },
+    {
+      "key": "DefaultCompany",
+      "type": "input",
+      "defaultValue": "",
+      "templateOptions": {
+        "label": "DefaultCompany",
+        "placeholder": "Enyoi",
+        "required": true
+      }
     }
   ]
