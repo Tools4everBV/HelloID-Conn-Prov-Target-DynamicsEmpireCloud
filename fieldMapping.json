@@ -2,24 +2,6 @@
   "Version": "v1",
   "MappingFields": [
     {
-      "Name": "DefaultCompany",
-      "Description": "",
-      "Type": "Text",
-      "MappingActions": [
-        {
-          "MapForActions": [
-            "Create",
-            "Update",
-            "Delete"
-          ],
-          "MappingMode": "Fixed",
-          "Value": "\"COMPANY\"",
-          "UsedInNotifications": false,
-          "StoreInAccountData": false
-        }
-      ]
-    },
-    {
       "Name": "UserSecurityID",
       "Description": "",
       "Type": "Text",
