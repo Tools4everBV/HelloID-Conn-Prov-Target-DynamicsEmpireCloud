@@ -1,0 +1,45 @@
+[
+    {
+      "key": "TenantID",
+      "type": "input",
+      "defaultValue": "",
+      "templateOptions": {
+        "label": "App Registration Directory (tenant) ID",
+        "placeholder": "611fsde2-0v74-4csdcc-6gaf-241t1qaf54",
+        "description": "",
+        "required": true
+      }
+    },
+    {
+      "key": "AppId",
+      "type": "input",
+      "defaultValue": "",
+      "templateOptions": {
+        "label": "App Registration Application (client) ID",
+        "placeholder": "9cwert29b1-34c5-678d-ac34-8ahert00d46d",
+        "description": "",
+        "required": true
+      }
+    },
+    {
+      "key": "AppSecret",
+      "type": "input",
+      "defaultValue": "",
+      "templateOptions": {
+        "label": "App Registration Client Secret",
+        "type": "password",
+        "placeholder": "3lib1sdfgvDvx.6abc98M._r0ysdfg_B34",
+        "required": true
+      }
+    },
+    {
+      "key": "Environment",
+      "type": "input",
+      "defaultValue": "",
+      "templateOptions": {
+        "label": "Environment",
+        "placeholder": "Production",
+        "required": true
+      }
+    }
+  ]
