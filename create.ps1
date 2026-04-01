@@ -144,7 +144,7 @@ try {
 
     #endregion Create authorization headers
     $environment = $($actionContext.Configuration.Environment)   
-    $baseurl      = "https://deonline.api.bc.dynamics.com/v2.0/$($actionContext.Configuration.TenantID)/$environment"
+    $baseurl      = "https://api.businesscentral.dynamics.com/v2.0/$($actionContext.Configuration.TenantID)/$environment"
     
     # Get Users & Filter on correlation fields
     $Users = Invoke-RestMethod `
@@ -177,8 +177,8 @@ try {
             $outputContext.Data.userName = $($correlatedAccount.Username)
             
             $accountRef = [PSCustomObject]@{
-                SecurityID  = $outputContext.Data.UserSecurityID
-                DisplayName = $outputContext.Data.DisplayName
+                UserSecurityID  = $outputContext.Data.UserSecurityID
+                Fullname = $outputContext.Data.DisplayName
                 UserName    = $outputContext.Data.UserName
             }
 
@@ -187,7 +187,7 @@ try {
         
             $outputContext.AuditLogs.Add([PSCustomObject]@{
                     Action  = 'CorrelateAccount'
-                    Message = "Correlated account: [$($actionContext.Data.Username)]. AccountReference is: [$($outputContext.AccountReference)"
+                    Message = "Correlated account: [$($outputContext.Data.Username)]. AccountReference is: [$($outputContext.AccountReference)"
                     IsError = $false
                 })
 
