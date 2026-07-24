@@ -44,8 +44,6 @@ function New-AuthorizationHeaders {
         $headers.Add('Authorization', "Bearer $accesstoken")
         $headers.Add('Accept', 'application/json')
         $headers.Add('Content-Type', 'application/json')
-        # Needed to filter on specific attributes (https://docs.microsoft.com/en-us/graph/aad-advanced-queries)
-        $headers.Add('ConsistencyLevel', 'eventual')
 
         Write-Output $headers  
     }
@@ -122,16 +120,6 @@ try {
         Throw "Configuration of correlation is mandatory."
     }
 
-    # Get access token
-    $body = @{
-        grant_type="client_credentials";
-        scope="https://api.businesscentral.dynamics.com/.default";
-        client_id=$($actionContext.Configuration.AppId)
-        client_secret=$($actionContext.Configuration.AppSecret)
-    }
-
-    $oauth = Invoke-RestMethod -Method Post -Uri $("https://login.microsoftonline.com/$($actionContext.Configuration.TenantID)/oauth2/v2.0/token") -Body $body
-
     # Setup authentication headers
     $splatParamsAuthorizationHeaders = @{
         TenantID = $actionContext.Configuration.TenantID
@@ -156,7 +144,7 @@ try {
     $User = $Result[$correlationValue]
 
     if (($user | measure-object).count -gt 1) {
-        $auditMessage = "Multiple users found for [$($person.DisplayName)] with correlationValue [($correlationValue)]"
+        $auditMessage = "Multiple users found for [$($personContext.Person.DisplayName)] with correlationValue [($correlationValue)]"
         Throw $auditMessage
     }
     elseif (($user | measure-object).count -eq 1) {
@@ -173,21 +161,21 @@ try {
             Write-Information 'Correlating Empire account'
 
             $outputContext.Data.userSecurityID = $($correlatedAccount.UserSecurityID)
-            $outputContext.Data.DisplayName = $($correlatedAccount.Displayname)
+            $outputContext.Data.Fullname = $($correlatedAccount.Displayname)
             $outputContext.Data.userName = $($correlatedAccount.Username)
             
             $accountRef = [PSCustomObject]@{
                 UserSecurityID  = $outputContext.Data.UserSecurityID
-                Fullname = $outputContext.Data.DisplayName
+                Fullname = $outputContext.Data.Fullname
                 UserName    = $outputContext.Data.UserName
             }
 
             $outputContext.AccountReference = $accountRef
-            $outputContext.success = $true
+            $outputContext.Success = $true
         
             $outputContext.AuditLogs.Add([PSCustomObject]@{
                     Action  = 'CorrelateAccount'
-                    Message = "Correlated account: [$($outputContext.Data.Username)]. AccountReference is: [$($outputContext.AccountReference)"
+                    Message = "Correlated account: [$($outputContext.Data.Username)]. AccountReference is: [$($outputContext.AccountReference)]"
                     IsError = $false
                 })
 
@@ -209,7 +197,7 @@ try {
     }
 }
 catch {
-    $outputContext.success = $false
+    $outputContext.Success = $false
     $ex = $PSItem
     if ($($ex.Exception.GetType().FullName -eq 'Microsoft.PowerShell.Commands.HttpResponseException') -or
         $($ex.Exception.GetType().FullName -eq 'System.Net.WebException')) {
@@ -225,5 +213,4 @@ catch {
             Message = $auditMessage
             IsError = $true
         })
-
 }

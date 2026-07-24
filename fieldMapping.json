@@ -20,7 +20,7 @@
       ]
     },
     {
-      "Name": "DisplayName",
+      "Name": "Fullname",
       "Description": "",
       "Type": "Text",
       "MappingActions": [

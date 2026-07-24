@@ -7,18 +7,22 @@
 > [!IMPORTANT]
 > This repository contains the connector and configuration code only. The implementer is responsible to acquire the connection details such as username, password, certificate, etc. You might even need to sign a contract or agreement with the supplier before implementing this connector. Please contact the client's application manager to coordinate the connector requirements.
 
+> [!NOTE]
+> This connector is usually linked to the [HelloID-Conn-Prov-Target-Authorizationbox](https://github.com/Tools4everBV/HelloID-Conn-Prov-Target-Authorizationbox) connector, as the `UserSecurityID` is required there.
+
 <p align="center">
   <img src="">
 </p>
 
 ## Table of contents
 
-- [HelloID-Conn-Prov-Target-DynamicsEmpireCloud](#helloid-conn-prov-target-DynamicsEmpireCloud)
+- [HelloID-Conn-Prov-Target-DynamicsEmpireCloud](#helloid-conn-prov-target-dynamicsempirecloud)
   - [Table of contents](#table-of-contents)
   - [Introduction](#introduction)
-  - [Supported  features](#supported--features)
+  - [Supported features](#supported-features)
   - [Getting started](#getting-started)
-    - [Prerequisites](#prerequisites)
+    - [HelloID Icon URL](#helloid-icon-url)
+    - [Requirements](#requirements)
     - [Connection settings](#connection-settings)
     - [Correlation configuration](#correlation-configuration)
     - [Field mapping](#field-mapping)
@@ -32,57 +36,58 @@
 
 ## Introduction
 
-_HelloID-Conn-Prov-Target-DynamicsEmpireCloud_ is a _target_ connector. _DynamicsEmpireCloud_ provides a set of REST API's that allow you to programmatically interact with its data.
+_HelloID-Conn-Prov-Target-DynamicsEmpireCloud_ is a _target_ connector. _DynamicsEmpireCloud_ provides a set of REST APIs that allow you to programmatically interact with its data. This connector connects to the Microsoft Business Central cloud API using OAuth 2.0 client credentials.
 
-## Supported  features
+## Supported features
 
 The following features are available:
 
-| Feature                                   | Supported | Actions                                 | Remarks           |
-| ----------------------------------------- | --------- | --------------------------------------- | ----------------- |
-| **Account Lifecycle**                     | ✅        | Create                                  |                   |
-| **Permissions**                           | ❌        | -                                       |                   |
-| **Resources**                             | ❌        | -                                       |                   |
-| **Entitlement Import: Accounts**          | ❌        | -                                       |                   |
-| **Entitlement Import: Permissions**       | ❌        | -                                       |                   |
-| **Governance Reconciliation Resolutions** | ❌        | -                                       |                   |
+| Feature                                   | Supported | Actions           | Remarks                      |
+| ----------------------------------------- | --------- | ----------------- | ---------------------------- |
+| **Account Lifecycle**                     | ✅        | Correlate | Correlation is mandatory. Users are provisioned through a license group  |
+| **Permissions**                           | ❌        | -                 |                              |
+| **Resources**                             | ❌        | -                 |                              |
+| **Entitlement Import: Accounts**          | ❌        | -                 |                              |
+| **Entitlement Import: Permissions**       | ❌        | -                 |                              |
+| **Governance Reconciliation Resolutions** | ❌        | -                 |                              |
 
 ## Getting started
 
-### Prerequisites
+### HelloID Icon URL
 
-<!--
-Describe the specific requirements that must be met before using this connector, such as the need for an agent, a certificate or IP whitelisting.
+URL of the icon used for the HelloID Provisioning target system.
 
-**Please ensure to list the requirements using bullet points for clarity.**
+```
+https://raw.githubusercontent.com/Tools4everBV/HelloID-Conn-Prov-Target-DynamicsEmpireCloud/refs/heads/main/Icon.png
+```
 
-Example:
+### Requirements
 
-- **SSL Certificate**:<br>
-  A valid SSL certificate must be installed on the server to ensure secure communication. The certificate should be trusted by a recognized Certificate Authority (CA) and must not be self-signed.
-- **IP Whitelisting**:<br>
-  The IP addresses used by the connector must be whitelisted on the target system's firewall to allow access. Ensure that the firewall rules are configured to permit incoming and outgoing connections from these IPs.
--->
+- An **Azure AD App Registration** with `client_credentials` grant and access to the Business Central API (`https://api.businesscentral.dynamics.com/.default`).
+- The App Registration must be assigned as an **Authorized Client App** in Business Central and the service principal must have sufficient rights to read users.
+- Linked usage with the **AuthorizationBox** connector.
 
 ### Connection settings
 
 The following settings are required to connect to the API.
 
-| Setting  | Description                        | Mandatory |
-| -------- | ---------------------------------- | --------- |
-| UserName | The UserName to connect to the API | Yes       |
-| Password | The Password to connect to the API | Yes       |
-| BaseUrl  | The URL to the API                 | Yes       |
+| Setting        | Description                                                  | Mandatory |
+| -------------- | ------------------------------------------------------------ | --------- |
+| TenantID       | The Azure AD Directory (tenant) ID                           | Yes       |
+| AppId          | The Azure AD App Registration Application (client) ID        | Yes       |
+| AppSecret      | The Azure AD App Registration Client Secret                  | Yes       |
+| Environment    | The Business Central environment name (e.g. `Production`)    | Yes       |
+| DefaultCompany | The Business Central company name used to scope API requests | Yes       |
 
 ### Correlation configuration
 
 The correlation configuration is used to specify which properties will be used to match an existing account within _DynamicsEmpireCloud_ to a person in _HelloID_.
 
-| Setting                   | Value                             |
-| ------------------------- | --------------------------------- |
-| Enable correlation        | `True`                            |
-| Person correlation field  | `PersonContext.Person.ExternalId` |
-| Account correlation field | `EmployeeNumber`                  |
+| Setting                   | Value                                                              |
+| ------------------------- | ------------------------------------------------------------------ |
+| Enable correlation        | `True`                                                             |
+| Person correlation field  | `Mail` |
+| Account correlation field | `contactEmail`                                                         |
 
 > [!TIP]
 > _For more information on correlation, please refer to our correlation [documentation](https://docs.helloid.com/en/provisioning/target-systems/powershell-v2-target-systems/correlation.html) pages_.
@@ -93,39 +98,30 @@ The field mapping can be imported by using the _fieldMapping.json_ file.
 
 ### Account Reference
 
-The account reference is populated with an object the property `id` property from _DynamicsEmpireCloud_
+The account reference is populated with the properties `UserSecurityID`, `FullName`, and `UserName` from _DynamicsEmpireCloud_. It is advised not to change the reference after creation or correlation, as the `UserSecurityID` is required by the AuthorizationBox connector.
 
 ## Remarks
 
-<!--
-Provide remarks on special aspects of the code or the internal workings of the connector.
-
-**Please ensure to use `###` tags for H3 headings for each remark.**
-
-Example:
-
-### GET Account API Limitation
-- **No GET Endpoint**: The API does not support a GET request to retrieve account details. You may need to use alternative methods or endpoints to access account information, such as using a POST request with appropriate parameters.
+- Correlation is **mandatory** for this connector. The create action will return an error when no matching account is found in Business Central.
+- This connector is usually linked to the AuthorizationBox connector, as `UserSecurityID` is required there.
 
 ### Correlation Based on Email Address
 - **Email Address Correlation**: The connector relies on email addresses to correlate and match records between systems. Ensure that email addresses are accurately maintained and consistent across systems to avoid issues with data synchronization and matching.
--->
 
 ## Development resources
 
 ### API endpoints
 
-The following endpoints are used by the connector
+The following endpoints are used by the connector.
 
-| Endpoint | Description               |
-| -------- | ------------------------- |
-| /Users   | Retrieve user information |
+| Endpoint                                                      | Description                       |
+| ------------------------------------------------------------- | --------------------------------- |
+| `/api/microsoft/automation/v2.0/users?company={companyName}` | Retrieve all users for a company  |
 
 ### API documentation
 
-<!--
-If publicly available, provide the link to the API documentation
--->
+Unofficial documentation on creating the app registration:
+https://docs.cloudblue.com/cbc/21.0/Native-Integrations/Conifguring-Dynamics-Application.htm
 
 ## Getting help
 
