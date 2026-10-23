@@ -134,17 +134,33 @@ try {
     $environment = $($actionContext.Configuration.Environment)   
     $baseurl      = "https://api.businesscentral.dynamics.com/v2.0/$($actionContext.Configuration.TenantID)/$environment"
     
-    # Get Users & Filter on correlation fields
-    $Users = Invoke-RestMethod `
-                -Method Get `
-                -Uri $("$baseurl/api/microsoft/automation/v2.0/users?company=$($actionContext.Configuration.DefaultCompany)") `
-                -Headers $authHeaders
+    # Get Users (with paging) & Filter on correlation fields
+    $company = [uri]::EscapeDataString($actionContext.Configuration.DefaultCompany)
+    $nextLink = "$baseurl/api/microsoft/automation/v2.0/users?company=$company"
+    $Users = [System.Collections.Generic.List[object]]::new()
 
-    $Result = $Users.value | Group-Object $correlationProperty -AsHashTable
-    $User = $Result[$correlationValue]
+    do {
+        $splatGetUsers = @{
+            Uri     = $nextLink
+            Method  = 'GET'
+            Headers = $authHeaders
+        }
+        $response = Invoke-RestMethod @splatGetUsers
+
+        foreach ($empireUser in $response.value) {
+            $Users.Add($empireUser)
+        }
+        $nextLink = $response.'@odata.nextLink'
+    } while (-not [string]::IsNullOrEmpty($nextLink))
+
+    $User = $null
+    if ($Users.Count -gt 0) {
+        $Result = $Users | Group-Object $correlationProperty -AsHashTable
+        $User = $Result[$correlationValue]
+    }
 
     if (($user | measure-object).count -gt 1) {
-        $auditMessage = "Multiple users found for [$($personContext.Person.DisplayName)] with correlationValue [($correlationValue)]"
+        $auditMessage = "Multiple users found for [$($personContext.Person.DisplayName)] with correlationValue [$correlationValue]"
         Throw $auditMessage
     }
     elseif (($user | measure-object).count -eq 1) {
@@ -175,7 +191,7 @@ try {
         
             $outputContext.AuditLogs.Add([PSCustomObject]@{
                     Action  = 'CorrelateAccount'
-                    Message = "Correlated account: [$($outputContext.Data.Username)]. AccountReference is: [$($outputContext.AccountReference)]"
+                    Message = "Correlated account: [$($outputContext.Data.Username)]. UserSecurityID is: [$($outputContext.AccountReference.UserSecurityID)]"
                     IsError = $false
                 })
 
@@ -185,13 +201,13 @@ try {
         }
 
         'NotFound' {
+            $outputContext.Success = $false
             $outputContext.AuditLogs.Add([PSCustomObject]@{
                     Action  = 'CorrelateAccount'
                     Message = "Correlate account was unsuccessful. User has not been found in Empire"
                     IsError = $true
                 })
 
-            Write-Error 'User not found in Empire'
             break
         }
     }

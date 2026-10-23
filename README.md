@@ -42,14 +42,14 @@ _HelloID-Conn-Prov-Target-DynamicsEmpireCloud_ is a _target_ connector. _Dynamic
 
 The following features are available:
 
-| Feature                                   | Supported | Actions           | Remarks                      |
-| ----------------------------------------- | --------- | ----------------- | ---------------------------- |
-| **Account Lifecycle**                     | ✅        | Correlate | Correlation is mandatory. Users are provisioned through a license group  |
-| **Permissions**                           | ❌        | -                 |                              |
-| **Resources**                             | ❌        | -                 |                              |
-| **Entitlement Import: Accounts**          | ❌        | -                 |                              |
-| **Entitlement Import: Permissions**       | ❌        | -                 |                              |
-| **Governance Reconciliation Resolutions** | ❌        | -                 |                              |
+| Feature                                   | Supported | Actions   | Remarks                                                                 |
+| ----------------------------------------- | --------- | --------- | ----------------------------------------------------------------------- |
+| **Account Lifecycle**                     | ✅        | Correlate | Correlation is mandatory. Users are provisioned through a license group |
+| **Permissions**                           | ❌        | -         |                                                                         |
+| **Resources**                             | ❌        | -         |                                                                         |
+| **Entitlement Import: Accounts**          | ❌        | -         |                                                                         |
+| **Entitlement Import: Permissions**       | ❌        | -         |                                                                         |
+| **Governance Reconciliation Resolutions** | ❌        | -         |                                                                         |
 
 ## Getting started
 
@@ -83,11 +83,11 @@ The following settings are required to connect to the API.
 
 The correlation configuration is used to specify which properties will be used to match an existing account within _DynamicsEmpireCloud_ to a person in _HelloID_.
 
-| Setting                   | Value                                                              |
-| ------------------------- | ------------------------------------------------------------------ |
-| Enable correlation        | `True`                                                             |
-| Person correlation field  | `Mail` |
-| Account correlation field | `contactEmail`                                                         |
+| Setting                   | Value                                    |
+| ------------------------- | ---------------------------------------- |
+| Enable correlation        | `True`                                   |
+| Person correlation field  | `Accounts.MicrosoftActiveDirectory.mail` |
+| Account correlation field | `contactEmail`                           |
 
 > [!TIP]
 > _For more information on correlation, please refer to our correlation [documentation](https://docs.helloid.com/en/provisioning/target-systems/powershell-v2-target-systems/correlation.html) pages_.
@@ -98,7 +98,7 @@ The field mapping can be imported by using the _fieldMapping.json_ file.
 
 ### Account Reference
 
-The account reference is populated with the properties `UserSecurityID`, `FullName`, and `UserName` from _DynamicsEmpireCloud_. It is advised not to change the reference after creation or correlation, as the `UserSecurityID` is required by the AuthorizationBox connector.
+The account reference is populated with the properties `UserSecurityID`, `Fullname`, and `UserName` from _DynamicsEmpireCloud_. It is advised not to change the reference after creation or correlation, as the `UserSecurityID` is required by the AuthorizationBox connector.
 
 ## Remarks
 
@@ -106,6 +106,7 @@ The account reference is populated with the properties `UserSecurityID`, `FullNa
 - This connector is usually linked to the AuthorizationBox connector, as `UserSecurityID` is required there.
 
 ### Correlation Based on Email Address
+
 - **Email Address Correlation**: The connector relies on email addresses to correlate and match records between systems. Ensure that email addresses are accurately maintained and consistent across systems to avoid issues with data synchronization and matching.
 
 ## Development resources
