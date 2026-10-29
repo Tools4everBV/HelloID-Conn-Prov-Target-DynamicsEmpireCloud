@@ -8,9 +8,7 @@
       "MappingActions": [
         {
           "MapForActions": [
-            "Create",
-            "Update",
-            "Delete"
+            "Create"
           ],
           "MappingMode": "None",
           "Value": "null",
@@ -20,15 +18,13 @@
       ]
     },
     {
-      "Name": "DisplayName",
+      "Name": "Fullname",
       "Description": "",
       "Type": "Text",
       "MappingActions": [
         {
           "MapForActions": [
-            "Create",
-            "Update",
-            "Delete"
+            "Create"
           ],
           "MappingMode": "None",
           "Value": "\"\"",
@@ -44,9 +40,7 @@
       "MappingActions": [
         {
           "MapForActions": [
-            "Create",
-            "Update",
-            "Delete"
+            "Create"
           ],
           "MappingMode": "None",
           "Value": "\"\"",
@@ -62,9 +56,7 @@
       "MappingActions": [
         {
           "MapForActions": [
-            "Create",
-            "Update",
-            "Delete"
+            "Create"
           ],
           "MappingMode": "Complex",
           "Value": "\"function getValue(){\\r\\n    let email = Person.Accounts.MicrosoftActiveDirectory.Mail\\r\\n\\r\\n    return email\\r\\n\\r\\n}\\r\\n\\r\\ngetValue()\"",
